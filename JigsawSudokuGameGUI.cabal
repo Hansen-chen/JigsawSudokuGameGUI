@@ -35,6 +35,7 @@ library
   build-depends:
       base >=4.7 && <5
     , gloss == 1.13.*
+    , containers
   default-language: Haskell2010
 
 executable JigsawSudokuGameGUI-exe
@@ -48,6 +49,7 @@ executable JigsawSudokuGameGUI-exe
       JigsawSudokuGameGUI
     , base >=4.7 && <5
     , gloss == 1.13.*
+    , containers
   default-language: Haskell2010
 
 test-suite JigsawSudokuGameGUI-test
@@ -62,4 +64,5 @@ test-suite JigsawSudokuGameGUI-test
       JigsawSudokuGameGUI
     , base >=4.7 && <5
     , gloss == 1.13.*
+    , containers
   default-language: Haskell2010

@@ -1,8 +1,9 @@
 module Main where
 
-import Lib
+import JigsawSudokuConstant
+import JigsawSudokuType
 import Graphics.Gloss
+import Graphics.Gloss.Interface.Pure.Game
 
 main :: IO ()
--- main = someFunc
-main = display FullScreen white (Circle 80)
+main = display windowDisplay white (Circle 80)
