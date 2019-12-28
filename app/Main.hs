@@ -24,7 +24,7 @@ renderGame :: Game -> (Int,Int) -> Picture
 renderGame game cell = pictures 
   [
     renderBoard game,
---    renderFocus cell,
+    renderCurrentCell cell,
     renderMsg game
   ]
 
@@ -48,16 +48,19 @@ renderCell cell block = pictures
     translate (- globalCellSize / 4) (- globalCellSize / 4) $ scale 0.2 0.2 $ text $ if cell > 0 then show cell else "" 
   ]
 
-{--
-renderFocus :: Coord -> Picture
-renderFocus (r, c) =
-  color black $ translate (((fromIntegral c) - 4) * globalCellSize) ((4 - (fromIntegral r)) * globalCellSize) $
-    rectangleWire globalCellSize globalCellSize
---}  
+
+renderCurrentCell :: (Int, Int) -> Picture
+renderCurrentCell (x, y) =
+  color black $ translate (((fromIntegral x) - 4) * globalCellSize) ((4 - (fromIntegral y)) * globalCellSize) $ rectangleWire globalCellSize globalCellSize
+  
 
 inputHandler :: Event -> GameState -> GameState
-inputHandler (EventKey (SpecialKey KeyUp) Down _ _) state@(GameState{currentCell=cell}) = state
-inputHandler (EventKey (SpecialKey KeyDown) Down _ _) state@(GameState{currentCell=cell}) = state
-inputHandler (EventKey (SpecialKey KeyRight) Down _ _) state@(GameState{currentCell=cell}) = state
-inputHandler (EventKey (SpecialKey KeyLeft) Down _ _) state@(GameState{currentCell=cell}) = state
+inputHandler (EventKey (SpecialKey KeyLeft) Down _ _) state@(GameState{currentCell=cell}) = state{currentCell= moveCurrentCell cell (-1) 0}
+inputHandler (EventKey (SpecialKey KeyRight) Down _ _) state@(GameState{currentCell=cell}) = state{currentCell= moveCurrentCell cell (1) 0}
+inputHandler (EventKey (SpecialKey KeyDown) Down _ _) state@(GameState{currentCell=cell}) = state{currentCell= moveCurrentCell cell 0 (1)}
+inputHandler (EventKey (SpecialKey KeyUp) Down _ _) state@(GameState{currentCell=cell}) = state{currentCell= moveCurrentCell cell 0 (-1) }
 inputHandler _ s = s
+
+moveCurrentCell :: (Int, Int) -> Int -> Int -> (Int, Int)
+moveCurrentCell (x, y) dx dy | (x+dx)>=0 && (x+dx)<=8 && (y+dy)>=0 && (y+dy)<=8 = (x + dx, y + dy) 
+                             | otherwise = (x,y)

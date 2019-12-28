@@ -29,9 +29,6 @@ shuffle xs = do
 globalCellSize :: Float
 globalCellSize = 40
 
-maxCellIndex :: Int
-maxCellIndex = 8
-
 windowWidth :: Int
 windowWidth = 360+200
 
