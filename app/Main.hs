@@ -7,18 +7,10 @@ import Graphics.Gloss
 import Graphics.Gloss.Interface.Pure.Game
 
 main :: IO ()
-main = display windowDisplay white (rectangleSolid globalCellSize globalCellSize)
-
+main = windowDisplay >>= \w -> (display w white (rectangleSolid globalCellSize globalCellSize) )
+{--
 main = do
-  (screenWidth, screenHeight) <- getScreenSize
-  let 
-    windowWidth = 360
-    windowHeight = 450
-    windowLeft = (screenWidth - windowWidth) `div` 2
-    windowTop = (screenHeight - windowHeight) `div` 2
-    window = InWindow "Jigsaw Sudoku" (windowWidth, windowHeight) (windowLeft, windowTop)
-
-  game <- loadGame "maps/map.txt"
+  game <- loadGame "board/map.txt"
   let
     solution = solveGame game
     state = Playing{game=game, focus=(0,0), solution=solution}
@@ -31,10 +23,6 @@ updateWorld _ state = state
 
 renderWorld :: State -> Picture
 renderWorld Playing{game=game, focus=focus} = renderGame game focus
-
-
-cellLength :: Float
-cellLength = 40.0
 
 renderGame :: Game -> Coord -> Picture
 renderGame game focus = pictures 
@@ -114,3 +102,4 @@ moveFocus (r, c) dr dc =
   in
     if 0 <= r' && r' <= 8 && 0 <= c' && c' <= 8 
     then (r', c') else (r, c)
+--}

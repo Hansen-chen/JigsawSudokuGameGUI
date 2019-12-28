@@ -7,7 +7,7 @@ import System.IO
 loadGame :: String -> IO Game
 loadGame f = readFile f >>= \b -> return (Game {board=(loadBoardFormat b), message="Read board successfully!", instruction="l: load" })
 
-saveGame :: Game -> String -> Game
+saveGame :: Game -> String -> IO Game
 saveGame game f = writeFile f (saveBoardFormat $ board game) >>= \_ -> return (Game {board=(board game), message="Save!", instruction=(instruction game) })
 
 -- Load Board String Manipulation
@@ -32,6 +32,9 @@ scanString (x:xs) | 0 <= sc && sc <= 9 = sc:(scanString xs)
 arrayConstructor :: [[Int]] -> [((Int, Int), Int)]
 arrayConstructor [[]] = [((0,0),0)]
 arrayConstructor m = [ ((x,y),m!!y!!x) | x <- [0..8], y <- [0..8] ]                   
+
+printArraySave :: ( Array (Int,Int) Int ) -> [Char]
+printArraySave arr = unlines [unwords [if (arr ! (x, y)) >= 0 then show (arr ! (x, y)) else show ('.') | x <- [0..8]] | y <- [0..8]]
 
 -- Make Move with Jigsaw Sudoku game rules checking 
 move :: Board -> Int -> Int -> Int -> Board
