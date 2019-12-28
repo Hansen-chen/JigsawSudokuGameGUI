@@ -15,7 +15,7 @@ windowHeight :: Int
 windowHeight = 450+200
 
 selectedColors :: [Color]
-selectedColors = map (withAlpha 0.6) [cyan, magenta, rose, chartreuse, red, green, azure, blue, yellow]
+selectedColors = [cyan, magenta, rose, chartreuse, violet , aquamarine , azure, yellow, orange ]
 
 windowDisplay :: IO Display
 windowDisplay = getScreenSize >>= \(screenWidth, screenHeight) -> return (InWindow "Jigsaw Sudoku Game GUI" (windowWidth, windowHeight) (((screenWidth - windowWidth) `div` 2), ((screenHeight - windowHeight) `div` 2)))

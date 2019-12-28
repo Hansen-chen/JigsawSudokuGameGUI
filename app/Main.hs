@@ -43,14 +43,14 @@ renderCell :: Int -> Int -> [Color] -> Picture
 renderCell cell block blockColors = pictures 
   [
     color (blockColors !! block) $ rectangleSolid globalCellSize globalCellSize,
-    color white $ rectangleWire globalCellSize globalCellSize,
+    color black $ rectangleWire globalCellSize globalCellSize,
     translate (- globalCellSize / 4) (- globalCellSize / 4) $ scale 0.2 0.2 $ text $ if cell > 0 then show cell else "" 
   ]
 
 
 renderCurrentCell :: (Int, Int) -> Picture
 renderCurrentCell (x, y) =
-  color black $ translate (((fromIntegral x) - 4) * globalCellSize) ((4 - (fromIntegral y)) * globalCellSize) $ rectangleWire globalCellSize globalCellSize
+  color white $ translate (((fromIntegral x) - 4) * globalCellSize) ((4 - (fromIntegral y)) * globalCellSize) $ rectangleWire globalCellSize globalCellSize
   
 
 inputHandler :: Event -> GameState -> GameState
