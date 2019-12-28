@@ -4,6 +4,7 @@ import JigsawSudokuConstant
 import JigsawSudokuType
 import JigsawSudokuControl
 import Data.Array
+import Data.List
 import System.IO
 import Graphics.Gloss
 import Graphics.Gloss.Interface.Pure.Game
@@ -58,6 +59,14 @@ inputHandler (EventKey (SpecialKey KeyLeft) Down _ _) state@(GameState{currentCe
 inputHandler (EventKey (SpecialKey KeyRight) Down _ _) state@(GameState{currentCell=cell}) = state{currentCell= moveCurrentCell cell (1) 0}
 inputHandler (EventKey (SpecialKey KeyDown) Down _ _) state@(GameState{currentCell=cell}) = state{currentCell= moveCurrentCell cell 0 (1)}
 inputHandler (EventKey (SpecialKey KeyUp) Down _ _) state@(GameState{currentCell=cell}) = state{currentCell= moveCurrentCell cell 0 (-1) }
+inputHandler (EventKey (SpecialKey k) Up _ _) state@(GameState{game=game, currentCell=cell}) 
+  | elem k keys = -- Input have bug
+    state{game = move game cell (1+(scanChar ((show (elemIndex k keys)) !! 0)))} 
+  | k == KeyDelete || k == KeyBackspace = -- Erase
+    state{game = move game cell (-1)}
+  | otherwise = state
+  where
+    keys = [KeyPad1, KeyPad2, KeyPad3, KeyPad4, KeyPad5, KeyPad6, KeyPad7, KeyPad8, KeyPad9]
 inputHandler _ s = s
 
 moveCurrentCell :: (Int, Int) -> Int -> Int -> (Int, Int)

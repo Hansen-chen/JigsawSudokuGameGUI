@@ -39,9 +39,9 @@ printArraySave :: ( Array (Int,Int) Int ) -> [Char]
 printArraySave arr = unlines [unwords [if (arr ! (x, y)) >= 0 then show (arr ! (x, y)) else show ('.') | x <- [0..8]] | y <- [0..8]]
 
 -- Make Move with Jigsaw Sudoku game rules checking 
-move :: Board -> Int -> Int -> Int -> Board
-move (Board num loc) x y n | check (Board num loc) x y n = Board (num // [((x,y), n)]) loc
-                            | otherwise = (Board num loc)
+move :: Game -> (Int, Int) -> Int -> Game
+move game (x,y) n | check (board game) x y n = game{board = (Board ((getNum (board game)) // [((x,y), n)]) (getBlock (board game))), message="Inserted "++ (show n) ++ " in row " ++ (show y) ++ ", col " ++ (show x) }
+                | otherwise = game{message="You cannot insert "++ (show n) ++ " in row " ++ (show y) ++ ", col " ++ (show x)}
 
 -- Implement checking including the range of location(0-8), number to be inserted (1-9), the location is empty or not,
 -- and the same line/row contains the number you are trying to insert or not.                            
