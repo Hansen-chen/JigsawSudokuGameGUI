@@ -2,6 +2,13 @@ module JigsawSudokuControl where
 
 import JigsawSudokuType
 import Data.Array
+import System.IO
+
+loadGame :: String -> IO Game
+loadGame f = readFile f >>= \b -> return (Game {board=(loadBoardFormat b), message="Read board successfully!", instruction="l: load" })
+
+saveGame :: Game -> String -> Game
+saveGame game f = writeFile f (saveBoardFormat $ board game) >>= \_ -> return (Game {board=(board game), message="Save!", instruction=(instruction game) })
 
 -- Load Board String Manipulation
 loadBoardFormat :: String -> Board
