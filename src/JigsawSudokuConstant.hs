@@ -33,10 +33,10 @@ maxCellIndex :: Int
 maxCellIndex = 8
 
 windowWidth :: Int
-windowWidth = 360
+windowWidth = 360+200
 
 windowHeight :: Int
-windowHeight = 450
+windowHeight = 450+200
 
 selectedColors :: [Color]
 selectedColors = map (withAlpha 0.6) [cyan, magenta, rose, chartreuse, red, green, azure, blue, yellow]

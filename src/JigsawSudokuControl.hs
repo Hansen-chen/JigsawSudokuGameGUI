@@ -58,5 +58,11 @@ jigsawBlockCheck (Board num loc) x y n = not (elem n (map ((!) num) (map (\((a,b
 jigsawSudokuCheck :: Board -> Bool
 jigsawSudokuCheck (Board num loc) = not (elem (-1) (elems num))
 
+getNum :: Board -> (Array (Int, Int) Int)
+getNum (Board num _) = num
+
+getBlock :: Board -> (Array (Int, Int) Int)
+getBlock (Board _ block) = block
+
 -- TODO: redo undo include in command
 -- add parameter list in play function [((Int,Int),Int)]

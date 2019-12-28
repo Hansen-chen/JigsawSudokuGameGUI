@@ -3,103 +3,61 @@ module Main where
 import JigsawSudokuConstant
 import JigsawSudokuType
 import JigsawSudokuControl
+import Data.Array
+import System.IO
 import Graphics.Gloss
 import Graphics.Gloss.Interface.Pure.Game
 
 main :: IO ()
-main = windowDisplay >>= \w -> (display w white (rectangleSolid globalCellSize globalCellSize) )
-{--
-main = do
-  game <- loadGame "board/map.txt"
-  let
-    solution = solveGame game
-    state = Playing{game=game, focus=(0,0), solution=solution}
+main = loadGame "board/map.txt" >>= \g ->
+            return GameState{game=g, currentCell=(0,0), solution=undefined} >>= \s ->
+                windowDisplay >>= \w ->
+                    play w white 100 s renderWorld inputHandler updateWorld
 
-  play window white 100 state renderWorld handleEvent updateWorld
-
-
-updateWorld :: Float -> State -> State
+updateWorld :: Float -> GameState -> GameState
 updateWorld _ state = state
 
-renderWorld :: State -> Picture
-renderWorld Playing{game=game, focus=focus} = renderGame game focus
+renderWorld :: GameState -> Picture
+renderWorld GameState{game=game, currentCell=cell} = renderGame game cell
 
-renderGame :: Game -> Coord -> Picture
-renderGame game focus = pictures 
+renderGame :: Game -> (Int,Int) -> Picture
+renderGame game cell = pictures 
   [
     renderBoard game,
-    renderFocus focus,
-    renderMsg
+--    renderFocus cell,
+    renderMsg game
   ]
 
-renderMsg :: Picture
-renderMsg = translate (-75) (-200) $ color black $ Scale 0.1 0.2 $ (Text "Congratulations! You've won!") 
--- rectangleSolid 360 (cellLength*3)
+renderMsg :: Game -> Picture
+renderMsg game = translate (-75) (-225) $ color black $ Scale 0.1 0.2 $ (Text $ message game) 
+-- TODO: change with pictures including a rectangleSolid
+-- rectangleSolid 360 (globalCellSize*3)
 
 renderBoard :: Game -> Picture
 renderBoard game = pictures
   [
-    translate (((fromIntegral c) - 4) * cellLength) ((4 - (fromIntegral r)) * cellLength) $ 
-      renderCell cell ((blocks game) ! (r,c)) (elem (r, c) conflicts)
-    | ((r, c), cell) <- assocs $ board game
+    translate (((fromIntegral x) - 4) * globalCellSize) ((4 - (fromIntegral y)) * globalCellSize) $ renderCell cell ((getBlock $ board game) ! (x,y)) | ((y, x), cell) <- assocs $ getNum $ board game
   ]
-  where
-    conflicts = allConflicts game
 
-renderCell :: Cell -> Int -> Bool -> Picture
-renderCell cell block hasConflicts = pictures 
+renderCell :: Int -> Int -> Picture
+renderCell cell block = pictures 
   [
-    color (colorsOfBlocks !! block) $ rectangleSolid cellLength cellLength,
-    color white $ rectangleWire cellLength cellLength,
-    color (if hasConflicts then red else black) $ translate (- cellLength / 4) (- cellLength / 4) $ 
-      scale 0.2 0.2 $ text $ maybe "" show cell
+    -- TODO: change selectedColors to blockColors
+    color (selectedColors !! block) $ rectangleSolid globalCellSize globalCellSize,
+    color white $ rectangleWire globalCellSize globalCellSize,
+    translate (- globalCellSize / 4) (- globalCellSize / 4) $ scale 0.2 0.2 $ text $ if cell > 0 then show cell else "" 
   ]
 
+{--
 renderFocus :: Coord -> Picture
 renderFocus (r, c) =
-  color black $ translate (((fromIntegral c) - 4) * cellLength) ((4 - (fromIntegral r)) * cellLength) $
-    rectangleWire cellLength cellLength
+  color black $ translate (((fromIntegral c) - 4) * globalCellSize) ((4 - (fromIntegral r)) * globalCellSize) $
+    rectangleWire globalCellSize globalCellSize
+--}  
 
-
-handleEvent :: Event -> State -> State
-
-handleEvent (EventKey (SpecialKey KeyUp) Up _ _) state@(Playing{focus=focus}) = 
-  state{focus = moveFocus focus (-1) 0}
-handleEvent (EventKey (SpecialKey KeyDown) Up _ _) state@(Playing{focus=focus}) = 
-  state{focus = moveFocus focus 1 0}
-handleEvent (EventKey (SpecialKey KeyLeft) Up _ _) state@(Playing{focus=focus}) = 
-  state{focus = moveFocus focus 0 (-1)}
-handleEvent (EventKey (SpecialKey KeyRight) Up _ _) state@(Playing{focus=focus}) = 
-  state{focus = moveFocus focus 0 1}
-
-handleEvent (EventKey (SpecialKey k) Up _ _) state@(Playing{game=game, focus=focus}) 
-  | elem k keys = -- Input
-    state{game = makeMove game focus (fmap (+1) (elemIndex k keys))} 
-  | k == KeyDelete || k == KeyBackspace = -- Erase
-    state{game = makeMove game focus Nothing}
-  | otherwise = state
-  where
-    keys = [KeyPad1, KeyPad2, KeyPad3, KeyPad4, KeyPad5, KeyPad6, KeyPad7, KeyPad8, KeyPad9]
-
-handleEvent (EventKey (Char c) Up _ _) state@(Playing{game=game, focus=focus, solution=solution})
-  | '1' <= c && c <= '9' = -- Input
-    state{game = makeMove game focus (Just $ digitToInt c)}
-  | c == '\b' = -- Erase
-    state{game = makeMove game focus Nothing}
-  | c == 'h' = -- Hint
-    state{game = makeMove game focus (solution ! focus)}
-  | c == 's' = -- Solve
-    state{game = game{board = solution}}
-  | otherwise = state
-
-handleEvent _ state = state
-
-moveFocus :: Coord -> Int -> Int -> Coord
-moveFocus (r, c) dr dc =
-  let 
-    r' = r + dr
-    c' = c + dc
-  in
-    if 0 <= r' && r' <= 8 && 0 <= c' && c' <= 8 
-    then (r', c') else (r, c)
---}
+inputHandler :: Event -> GameState -> GameState
+inputHandler (EventKey (SpecialKey KeyUp) Down _ _) state@(GameState{currentCell=cell}) = state
+inputHandler (EventKey (SpecialKey KeyDown) Down _ _) state@(GameState{currentCell=cell}) = state
+inputHandler (EventKey (SpecialKey KeyRight) Down _ _) state@(GameState{currentCell=cell}) = state
+inputHandler (EventKey (SpecialKey KeyLeft) Down _ _) state@(GameState{currentCell=cell}) = state
+inputHandler _ s = s
