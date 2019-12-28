@@ -1,37 +1,10 @@
 module JigsawSudokuType where
    
-import Data.Map as Map
-import Data.Char
-import Data.List
 import Graphics.Gloss
+import Data.Array
 
+-- First matrix records number in the Board, -1 as not filled
+-- The second matrix records the board location
+data Board = Board (Array (Int, Int) Int) (Array (Int, Int) Int) deriving (Eq)
 
-type Location = (Int, Int)
-
-data CellCoordinates = CellCoordinates
-  { cellCenter :: Point
-  , cellTopLeft :: Point
-  , cellTopRight :: Point
-  , cellBottomLeft :: Point
-  , cellBottomRight :: Point
-  }
-
-data BoundaryType = WorldBoundary | Wall | AdjacentCell Location
-  deriving (Show, Eq)
-data CellBoundaries = CellBoundaries
-  { upBoundary :: BoundaryType
-  , rightBoundary :: BoundaryType
-  , downBoundary :: BoundaryType
-  , leftBoundary :: BoundaryType
-  }
-  deriving (Show, Eq)
-
-type DirectionLens = CellBoundaries -> BoundaryType
-
-data World = World
-  { playerLocation :: Location
-  , startLocation :: Location
-  , endLocation :: Location
-  , worldBoundaries :: Map.Map Location CellBoundaries
-  }
 
