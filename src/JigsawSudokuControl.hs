@@ -1,14 +1,16 @@
 module JigsawSudokuControl where
 
 import JigsawSudokuType
+import JigsawSudokuConstant
 import Data.Array
 import System.IO
+import System.Random.Shuffle
 
 loadGame :: String -> IO Game
-loadGame f = readFile f >>= \b -> return (Game {board=(loadBoardFormat b), message="Read board successfully!", instruction="l: load" })
+loadGame f = readFile f >>= \b -> shuffleM selectedColors >>= \c -> return (Game {board=(loadBoardFormat b), message="Read board successfully!", instruction="l: load", blockColors=c })
 
 saveGame :: Game -> String -> IO Game
-saveGame game f = writeFile f (saveBoardFormat $ board game) >>= \_ -> return (Game {board=(board game), message="Save!", instruction=(instruction game) })
+saveGame game f = writeFile f (saveBoardFormat $ board game) >>= \_ -> return (Game {board=(board game), message="Save!", instruction=(instruction game), blockColors=(blockColors game) })
 
 -- Load Board String Manipulation
 loadBoardFormat :: String -> Board

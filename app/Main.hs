@@ -36,14 +36,13 @@ renderMsg game = translate (-75) (-225) $ color black $ Scale 0.1 0.2 $ (Text $ 
 renderBoard :: Game -> Picture
 renderBoard game = pictures
   [
-    translate (((fromIntegral x) - 4) * globalCellSize) ((4 - (fromIntegral y)) * globalCellSize) $ renderCell cell ((getBlock $ board game) ! (x,y)) | ((y, x), cell) <- assocs $ getNum $ board game
+    translate (((fromIntegral x) - 4) * globalCellSize) ((4 - (fromIntegral y)) * globalCellSize) $ renderCell cell ((getBlock $ board game) ! (x,y)) (blockColors game) | ((y, x), cell) <- assocs $ getNum $ board game
   ]
 
-renderCell :: Int -> Int -> Picture
-renderCell cell block = pictures 
+renderCell :: Int -> Int -> [Color] -> Picture
+renderCell cell block blockColors = pictures 
   [
-    -- TODO: change selectedColors to blockColors
-    color (selectedColors !! block) $ rectangleSolid globalCellSize globalCellSize,
+    color (blockColors !! block) $ rectangleSolid globalCellSize globalCellSize,
     color white $ rectangleWire globalCellSize globalCellSize,
     translate (- globalCellSize / 4) (- globalCellSize / 4) $ scale 0.2 0.2 $ text $ if cell > 0 then show cell else "" 
   ]
