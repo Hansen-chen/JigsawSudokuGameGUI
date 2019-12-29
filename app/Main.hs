@@ -37,8 +37,9 @@ renderDecoration :: Game -> Picture
 renderDecoration game = pictures 
     [
      translate (-globalCellSize*4) (globalCellSize*7) $ color black $ Scale 0.375 0.375 $ (Text $ "Jigsaw Sudoku"),
-     translate (-globalCellSize*5) (globalCellSize*6) $ color black $ Scale 0.125 0.125 $ (Text $ "1-9: insert number, arrow: move box, h: hint"),
-     translate (-globalCellSize*5) (globalCellSize*5.5) $ color black $ Scale 0.125 0.125 $ (Text $ "a: solve Sudoku, u: undo, r: redo, s: save"),
+     translate (-globalCellSize*6.5) (globalCellSize*6) $ color black $ Scale 0.125 0.125 $ (Text $ "arrow(Up/Down/Left/Right): move current cell, 1-9: insert number"),
+     translate (-globalCellSize*6.5) (globalCellSize*5.5) $ color black $ Scale 0.125 0.125 $ (Text $ "backspace: erase number, h: hint, a: solve Sudoku"),
+     translate (-globalCellSize*6.5) (globalCellSize*5) $ color black $ Scale 0.125 0.125 $ (Text $ "u: undo, r: redo, s: save"),
      translate (-globalCellSize*4) (-globalCellSize*6) $ color black $ Scale 0.125 0.2 $ (Text $ message game),
      color blue $ translate (-globalCellSize*0) (-globalCellSize*6) $ rectangleWire (globalCellSize*9) (globalCellSize*3),
      color blue $ translate (-globalCellSize*0) (-globalCellSize*0) $ rectangleWire (globalCellSize*9) (globalCellSize*9)
@@ -76,7 +77,7 @@ inputHandler (EventKey (Char c) Up _ _) state@(GameState{game=game, currentCell=
     state{game = move game cell (-1)}
   | c == 'h' = -- Hint
     state{game = move game cell ((getNum solution) ! cell)}
-  | c == 's' = -- Solve
+  | c == 'a' = -- Solve
     state{game = game{board = solution}}
   | otherwise = state
 

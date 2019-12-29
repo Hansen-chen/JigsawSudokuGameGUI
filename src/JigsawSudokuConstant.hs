@@ -9,10 +9,10 @@ globalCellSize :: Float
 globalCellSize = 40
 
 windowWidth :: Int
-windowWidth = 360+200
+windowWidth = 360+250
 
 windowHeight :: Int
-windowHeight = 450+200
+windowHeight = 450+250
 
 selectedColors :: [Color]
 selectedColors = map bright [cyan, magenta, rose, chartreuse, violet , aquamarine , azure, yellow, orange ]
