@@ -14,7 +14,7 @@ main :: IO ()
 main = putStrLn "Please enter board file name under board folder of this project(exclude .txt): " >>= \_ ->
         getLine >>= \f ->
             loadGame f >>= \g ->
-                    return GameState{game=g, currentCell=(0,0), solution=undefined, moves=[]} >>= \s ->
+                    return GameState{game=g, currentCell=(0,0), solution=undefined, moves=[], gamePointer=0} >>= \s ->
                         windowDisplay >>= \w ->
                             play w white 100 s renderUI inputHandler updateGame >>= \_ ->
                                 putStrLn "Game ends."
@@ -39,7 +39,7 @@ renderDecoration game = pictures
      translate (-globalCellSize*4) (globalCellSize*7) $ color black $ Scale 0.375 0.375 $ (Text $ "Jigsaw Sudoku"),
      translate (-globalCellSize*6.5) (globalCellSize*6) $ color black $ Scale 0.125 0.125 $ (Text $ "arrow(Up/Down/Left/Right): move current cell, 1-9: insert number"),
      translate (-globalCellSize*6.5) (globalCellSize*5.5) $ color black $ Scale 0.125 0.125 $ (Text $ "backspace: erase number, h: hint, a: solve Sudoku"),
-     translate (-globalCellSize*6.5) (globalCellSize*5) $ color black $ Scale 0.125 0.125 $ (Text $ "u: undo, r: redo, s: save"),
+     translate (-globalCellSize*6.5) (globalCellSize*5) $ color black $ Scale 0.125 0.125 $ (Text $ "u: undo, r: redo, s: save, Esc: quit"),
      translate (-globalCellSize*4) (-globalCellSize*6) $ color black $ Scale 0.125 0.2 $ (Text $ message game),
      color blue $ translate (-globalCellSize*0) (-globalCellSize*6) $ rectangleWire (globalCellSize*9) (globalCellSize*3),
      color blue $ translate (-globalCellSize*0) (-globalCellSize*0) $ rectangleWire (globalCellSize*9) (globalCellSize*9)
@@ -80,6 +80,10 @@ inputHandler (EventKey (Char c) Up _ _) state@(GameState{game=game, currentCell=
   | c == 'a' = -- Solve
     state{game = game{board = solution}}
   | c =='s' = --Save
+    state{game=saveGame game}
+  | c =='r' = --Redo
+    state{game=saveGame game}
+  | c =='u' = --Undo
     state{game=saveGame game}
   | otherwise = state
 

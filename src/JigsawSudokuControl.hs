@@ -41,7 +41,8 @@ arrayConstructor m = [ ((x,y),m!!y!!x) | x <- [0..8], y <- [0..8] ]
 printArraySave :: ( Array (Int,Int) Int ) -> [Char]
 printArraySave arr = unlines [unwords [if (arr ! (x, y)) >= 0 then show (arr ! (x, y)) else show ('.') | x <- [0..8]] | y <- [0..8]]
 
--- Make Move with Jigsaw Sudoku game rules checking 
+-- TODO: change Game into GameState
+-- Make Move with Jigsaw Sudoku game rules checking, insert move into array
 move :: Game -> (Int, Int) -> Int -> Game
 move game (x,y) n | n == (-1) && ( getNum (originalBoard game) ! (x,y) <0) = game{board = (Board ((getNum (board game)) // [((x,y), n)]) (getBlock (board game))), message="Erased "++ (show ((getNum (board game)) ! (x,y))) ++ " in row " ++ (show y) ++ ", col " ++ (show x) }
                 | (check (board game) x y n) && (getNum (originalBoard game) ! (x,y)<0) && (not $ jigsawSudokuCheck (Board ((getNum (board game)) // [((x,y), n)]) (getBlock (board game)))) = game{board = (Board ((getNum (board game)) // [((x,y), n)]) (getBlock (board game))), message="Inserted "++ (show n) ++ " in row " ++ (show y) ++ ", col " ++ (show x) }

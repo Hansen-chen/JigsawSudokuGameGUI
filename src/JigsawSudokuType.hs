@@ -10,6 +10,6 @@ data Board = Board (Array (Int, Int) Int) (Array (Int, Int) Int) deriving (Eq)
 
 data Game = Game {board :: Board, message :: String, blockColors :: [Color], originalBoard :: Board, filename :: String} deriving (Eq)
 
-data GameState = GameState {game :: Game, currentCell :: (Int, Int), solution :: Board, moves :: [((Int,Int), Int)]}
+data GameState = GameState {game :: Game, currentCell :: (Int, Int), solution :: Board, moves :: [((Int,Int), Int)], gamePointer :: Int} deriving (Eq)
 
 
