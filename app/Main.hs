@@ -44,14 +44,14 @@ renderCell :: Int -> Int -> [Color] -> Picture
 renderCell cell block blockColors = pictures 
   [
     color (blockColors !! block) $ rectangleSolid globalCellSize globalCellSize,
-    color black $ rectangleWire globalCellSize globalCellSize,
+    --color black $ rectangleWire globalCellSize globalCellSize,
     translate (- globalCellSize / 4) (- globalCellSize / 4) $ scale 0.2 0.2 $ text $ if cell > 0 then show cell else "" 
   ]
 
 
 renderCurrentCell :: (Int, Int) -> Picture
 renderCurrentCell (x, y) =
-  color white $ translate (((fromIntegral x) - 4) * globalCellSize) ((4 - (fromIntegral y)) * globalCellSize) $ rectangleWire globalCellSize globalCellSize
+  color black $ translate (((fromIntegral x) - 4) * globalCellSize) ((4 - (fromIntegral y)) * globalCellSize) $ rectangleWire globalCellSize globalCellSize
   
 
 inputHandler :: Event -> GameState -> GameState
@@ -59,14 +59,15 @@ inputHandler (EventKey (SpecialKey KeyLeft) Down _ _) state@(GameState{currentCe
 inputHandler (EventKey (SpecialKey KeyRight) Down _ _) state@(GameState{currentCell=cell}) = state{currentCell= moveCurrentCell cell (1) 0}
 inputHandler (EventKey (SpecialKey KeyDown) Down _ _) state@(GameState{currentCell=cell}) = state{currentCell= moveCurrentCell cell 0 (1)}
 inputHandler (EventKey (SpecialKey KeyUp) Down _ _) state@(GameState{currentCell=cell}) = state{currentCell= moveCurrentCell cell 0 (-1) }
-inputHandler (EventKey (SpecialKey k) Up _ _) state@(GameState{game=game, currentCell=cell}) 
-  | elem k keys = -- Input have bug
-    state{game = move game cell (1+(scanChar ((show (elemIndex k keys)) !! 0)))} 
-  | k == KeyDelete || k == KeyBackspace = -- Erase
-    state{game = move game cell (-1)}
+inputHandler (EventKey (Char c) Up _ _) state@(GameState{game=game, currentCell=cell, solution=solution})
+  | '1' <= c && c <= '9' = -- Input
+    state{game = move game cell (scanChar c)}
+  | c == 'h' = -- Hint
+    state{game = move game cell ((getNum solution) ! cell)}
+  | c == 's' = -- Solve
+    state{game = game{board = solution}}
   | otherwise = state
-  where
-    keys = [KeyPad1, KeyPad2, KeyPad3, KeyPad4, KeyPad5, KeyPad6, KeyPad7, KeyPad8, KeyPad9]
+
 inputHandler _ s = s
 
 moveCurrentCell :: (Int, Int) -> Int -> Int -> (Int, Int)
