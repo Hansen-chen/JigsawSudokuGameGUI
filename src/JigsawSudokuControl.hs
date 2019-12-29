@@ -7,10 +7,10 @@ import System.IO
 import System.Random.Shuffle
 
 loadGame :: String -> IO Game
-loadGame f = readFile f >>= \b -> shuffleM selectedColors >>= \c -> return (Game {board=(loadBoardFormat b), message="Read board successfully!", instruction="l: load", blockColors=c })
+loadGame f = readFile f >>= \b -> shuffleM selectedColors >>= \c -> return (Game {board=(loadBoardFormat b), originalBoard=(loadBoardFormat b), message="Read board "++f++" successfully!", blockColors=c })
 
 saveGame :: Game -> String -> IO Game
-saveGame game f = writeFile f (saveBoardFormat $ board game) >>= \_ -> return (Game {board=(board game), message="Save!", instruction=(instruction game), blockColors=(blockColors game) })
+saveGame game f = writeFile f (saveBoardFormat $ board game) >>= \_ -> return (Game {board=(board game), message="Saved!", blockColors=(blockColors game), originalBoard=(originalBoard game)})
 
 -- Load Board String Manipulation
 loadBoardFormat :: String -> Board
@@ -40,8 +40,10 @@ printArraySave arr = unlines [unwords [if (arr ! (x, y)) >= 0 then show (arr ! (
 
 -- Make Move with Jigsaw Sudoku game rules checking 
 move :: Game -> (Int, Int) -> Int -> Game
-move game (x,y) n | check (board game) x y n = game{board = (Board ((getNum (board game)) // [((x,y), n)]) (getBlock (board game))), message="Inserted "++ (show n) ++ " in row " ++ (show y) ++ ", col " ++ (show x) }
-                | otherwise = game{message="You cannot insert "++ (show n) ++ " in row " ++ (show y) ++ ", col " ++ (show x)}
+move game (x,y) n | n == (-1) && ( getNum (originalBoard game) ! (x,y) <0) = game{board = (Board ((getNum (board game)) // [((x,y), n)]) (getBlock (board game))), message="Erased "++ (show ((getNum (board game)) ! (x,y))) ++ " in row " ++ (show y) ++ ", col " ++ (show x) }
+                | (check (board game) x y n) && (getNum (originalBoard game) ! (x,y)<0) = game{board = (Board ((getNum (board game)) // [((x,y), n)]) (getBlock (board game))), message="Inserted "++ (show n) ++ " in row " ++ (show y) ++ ", col " ++ (show x) }
+                | n == (-1) && ( getNum (originalBoard game) ! (x,y) >0) = game{message="Cannot erase "++ (show ((getNum (board game)) ! (x,y))) ++ " in row " ++ (show y) ++ ", col " ++ (show x) }
+                | otherwise = game{message="Cannot insert "++ (show n) ++ " in row " ++ (show y) ++ ", col " ++ (show x)}
 
 -- Implement checking including the range of location(0-8), number to be inserted (1-9), the location is empty or not,
 -- and the same line/row contains the number you are trying to insert or not.                            
