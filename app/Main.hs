@@ -74,10 +74,10 @@ inputHandler (EventKey (Char c) Up _ _) state@(GameState{game=game, currentCell=
   | '1' <= c && c <= '9' = -- Input
     state{game = move game cell (scanChar c),moves=(movesUpdate moves (cell, (scanChar c)) pointer), gamePointer=pointer+1} 
   | c == '\b' = -- Erase
-    state{game = move game cell (-1)}
-  | c == 'h' = -- Hint
+    state{game = move game cell (-1),moves=(movesUpdate moves (cell, (scanChar c)) pointer), gamePointer=pointer+1}
+  | c == 'h' = -- Hint, link to undo/redo to be added
     state{game = move game cell ((getNum solution) ! cell)}
-  | c == 'a' = -- Solve
+  | c == 'a' = -- Solve, link to undo/redo to be added
     state{game = game{board = solution}}
   | c =='s' = --Save
     state{game=saveGame game}

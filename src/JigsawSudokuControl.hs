@@ -74,10 +74,10 @@ getBlock (Board _ block) = block
 
 jigsawSudokuGameUndo :: GameState -> GameState
 jigsawSudokuGameUndo state | (gamePointer state) == 0 = state{game = (game state){message="End of Undo"}}
-                           | otherwise = state{gamePointer = (gamePointer state)-1, game = jigsawSudokuGameReconstruct (game state){board = (initialBoard state)} (take ((gamePointer state)-1) (moves state)) }
+                           | otherwise = state{gamePointer = (gamePointer state)-1, game = jigsawSudokuGameReconstruct (game state){board = (initialBoard state), message="Initial Board"} (take ((gamePointer state)-1) (moves state)) }
 
 jigsawSudokuGameRedo :: GameState -> GameState
-jigsawSudokuGameRedo state | (gamePointer state) == length (moves state) = state
+jigsawSudokuGameRedo state | (gamePointer state) == length (moves state) = state{game = (game state){message="End of Redo"}}
                            | otherwise = state{gamePointer = (gamePointer state)+1, game = jigsawSudokuGameReconstruct (game state){board = (initialBoard state)} (take ((gamePointer state)+1) (moves state)) }
 
 jigsawSudokuGameReconstruct :: Game -> [((Int,Int), Int)] -> Game
