@@ -10,7 +10,7 @@ import Graphics.Gloss
 import Graphics.Gloss.Interface.Pure.Game
 
 main :: IO ()
-main = loadGame "board/map.txt" >>= \g ->
+main = loadGame "board/map2.txt" >>= \g ->
             return GameState{game=g, currentCell=(0,0), solution=undefined} >>= \s ->
                 windowDisplay >>= \w ->
                     play w white 100 s renderWorld inputHandler updateWorld
