@@ -41,7 +41,6 @@ arrayConstructor m = [ ((x,y),m!!y!!x) | x <- [0..8], y <- [0..8] ]
 printArraySave :: ( Array (Int,Int) Int ) -> [Char]
 printArraySave arr = unlines [unwords [if (arr ! (x, y)) >= 0 then show (arr ! (x, y)) else show ('.') | x <- [0..8]] | y <- [0..8]]
 
--- TODO: change Game into GameState
 -- Make Move with Jigsaw Sudoku game rules checking, insert move into array
 move :: Game -> (Int, Int) -> Int -> Game
 move game (x,y) n | n == (-1) && ( getNum (originalBoard game) ! (x,y) <0) = game{board = (Board ((getNum (board game)) // [((x,y), n)]) (getBlock (board game))), message="Erased "++ (show ((getNum (board game)) ! (x,y))) ++ " in row " ++ (show y) ++ ", col " ++ (show x) }
@@ -73,5 +72,14 @@ getNum (Board num _) = num
 getBlock :: Board -> (Array (Int, Int) Int)
 getBlock (Board _ block) = block
 
--- TODO: redo undo include in command
--- add parameter list in play function [((Int,Int),Int)]
+jigsawSudokuGameUndo :: GameState -> GameState
+jigsawSudokuGameUndo state | (gamePointer state) == 0 = state{game = (game state){message="End of Undo"}}
+                           | otherwise = state{gamePointer = (gamePointer state)-1, game = jigsawSudokuGameReconstruct (game state){board = (initialBoard state)} (take ((gamePointer state)-1) (moves state)) }
+
+jigsawSudokuGameRedo :: GameState -> GameState
+jigsawSudokuGameRedo state | (gamePointer state) == length (moves state) = state
+                           | otherwise = state{gamePointer = (gamePointer state)+1, game = jigsawSudokuGameReconstruct (game state){board = (initialBoard state)} (take ((gamePointer state)+1) (moves state)) }
+
+jigsawSudokuGameReconstruct :: Game -> [((Int,Int), Int)] -> Game
+jigsawSudokuGameReconstruct game [] = game
+jigsawSudokuGameReconstruct game (x:xs) = jigsawSudokuGameReconstruct (move game (fst x) (snd x)) xs

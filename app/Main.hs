@@ -14,7 +14,7 @@ main :: IO ()
 main = putStrLn "Please enter board file name under board folder of this project(exclude .txt): " >>= \_ ->
         getLine >>= \f ->
             loadGame f >>= \g ->
-                    return GameState{game=g, currentCell=(0,0), solution=undefined, moves=[], gamePointer=0} >>= \s ->
+                    return GameState{game=g, currentCell=(0,0), solution=undefined, initialBoard=(board g),moves=[], gamePointer=0} >>= \s ->
                         windowDisplay >>= \w ->
                             play w white 100 s renderUI inputHandler updateGame >>= \_ ->
                                 putStrLn "Game ends."
@@ -70,9 +70,9 @@ inputHandler (EventKey (SpecialKey KeyLeft) Down _ _) state@(GameState{currentCe
 inputHandler (EventKey (SpecialKey KeyRight) Down _ _) state@(GameState{currentCell=cell}) = state{currentCell= moveCurrentCell cell (1) 0}
 inputHandler (EventKey (SpecialKey KeyDown) Down _ _) state@(GameState{currentCell=cell}) = state{currentCell= moveCurrentCell cell 0 (1)}
 inputHandler (EventKey (SpecialKey KeyUp) Down _ _) state@(GameState{currentCell=cell}) = state{currentCell= moveCurrentCell cell 0 (-1) }
-inputHandler (EventKey (Char c) Up _ _) state@(GameState{game=game, currentCell=cell, solution=solution})
+inputHandler (EventKey (Char c) Up _ _) state@(GameState{game=game, currentCell=cell, solution=solution, moves=moves, gamePointer=pointer})
   | '1' <= c && c <= '9' = -- Input
-    state{game = move game cell (scanChar c)}
+    state{game = move game cell (scanChar c),moves=(movesUpdate moves (cell, (scanChar c)) pointer), gamePointer=pointer+1} 
   | c == '\b' = -- Erase
     state{game = move game cell (-1)}
   | c == 'h' = -- Hint
@@ -82,9 +82,9 @@ inputHandler (EventKey (Char c) Up _ _) state@(GameState{game=game, currentCell=
   | c =='s' = --Save
     state{game=saveGame game}
   | c =='r' = --Redo
-    state{game=saveGame game}
+    jigsawSudokuGameRedo state
   | c =='u' = --Undo
-    state{game=saveGame game}
+    jigsawSudokuGameUndo state
   | otherwise = state
 
 inputHandler _ s = s
@@ -92,3 +92,10 @@ inputHandler _ s = s
 moveCurrentCell :: (Int, Int) -> Int -> Int -> (Int, Int)
 moveCurrentCell (x, y) dx dy | (x+dx)>=0 && (x+dx)<=8 && (y+dy)>=0 && (y+dy)<=8 = (x + dx, y + dy) 
                              | otherwise = (x,y)
+
+movesUpdate :: [((Int, Int), Int)] -> ((Int, Int), Int) -> Int -> [((Int, Int), Int)]
+movesUpdate oldMoves newMove pointer | (length oldMoves) == 0  = [newMove]
+                                     | pointer == (length oldMoves) && (length oldMoves)>0  = oldMoves++[newMove]
+                                     | pointer < (length oldMoves) = (take pointer oldMoves)++[newMove]
+                                     | otherwise = oldMoves
+
