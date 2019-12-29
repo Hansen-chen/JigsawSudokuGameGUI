@@ -2,15 +2,18 @@ module JigsawSudokuControl where
 
 import JigsawSudokuType
 import JigsawSudokuConstant
+import Data.List
 import Data.Array
 import System.IO
+import System.IO.Unsafe
 import System.Random.Shuffle
 
 loadGame :: String -> IO Game
-loadGame f = readFile f >>= \b -> shuffleM selectedColors >>= \c -> return (Game {board=(loadBoardFormat b), originalBoard=(loadBoardFormat b), message="Read board "++f++" successfully!", blockColors=c })
+loadGame f | "-play" `isSuffixOf` f = readFile ("board/"++f++".txt") >>= \b -> readFile ("board/"++(take ((length f)-5) f)++".txt") >>= \ob -> shuffleM selectedColors >>= \c -> return (Game {board=(loadBoardFormat b), originalBoard=(loadBoardFormat ob), message="Read board "++(take ((length f)-5) f)++" successfully!", filename=(take ((length f)-5) f), blockColors=c }) 
+           | otherwise = readFile ("board/"++f++".txt") >>= \b -> shuffleM selectedColors >>= \c -> return (Game {board=(loadBoardFormat b), originalBoard=(loadBoardFormat b), message="Read board "++f++" successfully!", filename=f, blockColors=c })
 
-saveGame :: Game -> String -> IO Game
-saveGame game f = writeFile f (saveBoardFormat $ board game) >>= \_ -> return (Game {board=(board game), message="Saved!", blockColors=(blockColors game), originalBoard=(originalBoard game)})
+saveGame :: Game -> Game
+saveGame game = unsafePerformIO $ writeFile ("board/"++(filename game)++"-play.txt") (saveBoardFormat $ board game) >>= \_ -> return (Game {board=(board game), message="Saved board "++(filename game)++" successfully!", blockColors=(blockColors game), originalBoard=(originalBoard game), filename=(filename game)})
 
 -- Load Board String Manipulation
 loadBoardFormat :: String -> Board
@@ -42,7 +45,7 @@ printArraySave arr = unlines [unwords [if (arr ! (x, y)) >= 0 then show (arr ! (
 move :: Game -> (Int, Int) -> Int -> Game
 move game (x,y) n | n == (-1) && ( getNum (originalBoard game) ! (x,y) <0) = game{board = (Board ((getNum (board game)) // [((x,y), n)]) (getBlock (board game))), message="Erased "++ (show ((getNum (board game)) ! (x,y))) ++ " in row " ++ (show y) ++ ", col " ++ (show x) }
                 | (check (board game) x y n) && (getNum (originalBoard game) ! (x,y)<0) && (not $ jigsawSudokuCheck (Board ((getNum (board game)) // [((x,y), n)]) (getBlock (board game)))) = game{board = (Board ((getNum (board game)) // [((x,y), n)]) (getBlock (board game))), message="Inserted "++ (show n) ++ " in row " ++ (show y) ++ ", col " ++ (show x) }
-                | (check (board game) x y n) && (getNum (originalBoard game) ! (x,y)<0) && (jigsawSudokuCheck (Board ((getNum (board game)) // [((x,y), n)]) (getBlock (board game)))) = game{board = (Board ((getNum (board game)) // [((x,y), n)]) (getBlock (board game))), message="Inserted "++ (show n) ++ " in row " ++ (show y) ++ ", col " ++ (show x) ++ ". You win!" }
+                | (check (board game) x y n) && (getNum (originalBoard game) ! (x,y)<0) && (jigsawSudokuCheck (Board ((getNum (board game)) // [((x,y), n)]) (getBlock (board game)))) = game{board = (Board ((getNum (board game)) // [((x,y), n)]) (getBlock (board game))), message="Congratulations! You win the game!" }
                 | n == (-1) && ( getNum (originalBoard game) ! (x,y) >0) = game{message="Cannot erase "++ (show ((getNum (board game)) ! (x,y))) ++ " in row " ++ (show y) ++ ", col " ++ (show x) }
                 | otherwise = game{message="Cannot insert "++ (show n) ++ " in row " ++ (show y) ++ ", col " ++ (show x)}
 

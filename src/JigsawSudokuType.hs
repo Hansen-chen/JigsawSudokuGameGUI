@@ -8,9 +8,8 @@ import Graphics.Gloss.Data.Color
 -- The second matrix records the board location
 data Board = Board (Array (Int, Int) Int) (Array (Int, Int) Int) deriving (Eq)
 
-data Game = Game {board :: Board, message :: String, blockColors :: [Color], originalBoard :: Board} deriving (Eq)
+data Game = Game {board :: Board, message :: String, blockColors :: [Color], originalBoard :: Board, filename :: String} deriving (Eq)
 
--- TODO: add game state 'win/in progress'
-data GameState = GameState {game :: Game, currentCell :: (Int, Int), solution :: Board}
+data GameState = GameState {game :: Game, currentCell :: (Int, Int), solution :: Board, moves :: [((Int,Int), Int)]}
 
 

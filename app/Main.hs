@@ -9,12 +9,12 @@ import System.IO
 import Graphics.Gloss
 import Graphics.Gloss.Interface.Pure.Game
 
--- TODO: load progress file
+
 main :: IO ()
-main = putStrLn "Please enter board file name under board folder of this project(include .txt): " >>= \_ ->
+main = putStrLn "Please enter board file name under board folder of this project(exclude .txt): " >>= \_ ->
         getLine >>= \f ->
-            loadGame ("board/"++f) >>= \g ->
-                    return GameState{game=g, currentCell=(0,0), solution=undefined} >>= \s ->
+            loadGame f >>= \g ->
+                    return GameState{game=g, currentCell=(0,0), solution=undefined, moves=[]} >>= \s ->
                         windowDisplay >>= \w ->
                             play w white 100 s renderUI inputHandler updateGame >>= \_ ->
                                 putStrLn "Game ends."
@@ -79,6 +79,8 @@ inputHandler (EventKey (Char c) Up _ _) state@(GameState{game=game, currentCell=
     state{game = move game cell ((getNum solution) ! cell)}
   | c == 'a' = -- Solve
     state{game = game{board = solution}}
+  | c =='s' = --Save
+    state{game=saveGame game}
   | otherwise = state
 
 inputHandler _ s = s
