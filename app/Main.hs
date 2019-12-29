@@ -9,34 +9,40 @@ import System.IO
 import Graphics.Gloss
 import Graphics.Gloss.Interface.Pure.Game
 
+-- TODO: load progress file
 main :: IO ()
-main = loadGame "board/map2.txt" >>= \g ->
-            return GameState{game=g, currentCell=(0,0), solution=undefined} >>= \s ->
-                windowDisplay >>= \w ->
-                    play w white 100 s renderWorld inputHandler updateWorld
+main = putStrLn "Please enter board file name under board folder of this project(include .txt): " >>= \_ ->
+        getLine >>= \f ->
+            loadGame ("board/"++f) >>= \g ->
+                    return GameState{game=g, currentCell=(0,0), solution=undefined} >>= \s ->
+                        windowDisplay >>= \w ->
+                            play w white 100 s renderUI inputHandler updateGame >>= \_ ->
+                                putStrLn "Game ends."
 
-updateWorld :: Float -> GameState -> GameState
-updateWorld _ state = state
+updateGame :: Float -> GameState -> GameState
+updateGame _ state = state
 
-renderWorld :: GameState -> Picture
-renderWorld GameState{game=game, currentCell=cell} = renderGame game cell
+renderUI :: GameState -> Picture
+renderUI GameState{game=game, currentCell=cell} = renderGame game cell
 
 renderGame :: Game -> (Int,Int) -> Picture
 renderGame game cell = pictures 
   [
     renderBoard game,
     renderCurrentCell cell,
-    renderMsg game
+    renderDecoration game
   ]
 
-renderMsg :: Game -> Picture
-renderMsg game = pictures 
+renderDecoration :: Game -> Picture
+renderDecoration game = pictures 
     [
+     translate (-globalCellSize*4) (globalCellSize*7) $ color black $ Scale 0.375 0.375 $ (Text $ "Jigsaw Sudoku"),
+     translate (-globalCellSize*5) (globalCellSize*6) $ color black $ Scale 0.125 0.125 $ (Text $ "1-9: insert number, arrow: move box, h: hint"),
+     translate (-globalCellSize*5) (globalCellSize*5.5) $ color black $ Scale 0.125 0.125 $ (Text $ "a: solve Sudoku, u: undo, r: redo, s: save"),
      translate (-globalCellSize*4) (-globalCellSize*6) $ color black $ Scale 0.125 0.2 $ (Text $ message game),
-     color black $ translate (-globalCellSize*0) (-globalCellSize*6) $ rectangleWire (globalCellSize*9) (globalCellSize*3)
+     color blue $ translate (-globalCellSize*0) (-globalCellSize*6) $ rectangleWire (globalCellSize*9) (globalCellSize*3),
+     color blue $ translate (-globalCellSize*0) (-globalCellSize*0) $ rectangleWire (globalCellSize*9) (globalCellSize*9)
     ]
--- TODO: change with pictures including a rectangleSolid
--- rectangleSolid 360 (globalCellSize*3)
 
 renderBoard :: Game -> Picture
 renderBoard game = pictures
