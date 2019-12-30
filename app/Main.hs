@@ -14,7 +14,7 @@ main :: IO ()
 main = putStrLn "Please enter board file name under board folder of this project(exclude .txt): " >>= \_ ->
         getLine >>= \f ->
             loadGame f >>= \g ->
-                return GameState{game=g, currentCell=(0,0), solution=undefined, initialBoard=(board g),moves=[], gamePointer=0} >>= \s ->
+                return GameState{game=g, currentCell=(0,0), solution=(Board (solveGame g) (getBlock $ board g)), initialBoard=(board g),moves=[], gamePointer=0} >>= \s ->
                     play FullScreen white 100 s renderUI inputHandler updateGame >>= \_ ->
                         putStrLn "Game ends."
 
@@ -77,10 +77,10 @@ inputHandler (EventKey (Char c) Up _ _) state@(GameState{game=game, currentCell=
     state{game = move game cell (scanChar c),moves=(movesUpdate moves (cell, (scanChar c)) pointer), gamePointer=pointer+1} 
   | c == '\b' = -- Erase
     state{game = move game cell (-1),moves=(movesUpdate moves (cell, (-1)) pointer), gamePointer=pointer+1}
-  | c == 'h' = -- Hint, link to undo/redo to be added
-    state{game = move game cell ((getNum solution) ! cell)}
+  | c == 'h' = -- Hint
+    state{game = game{message = "Hint: " ++ (show $ (getNum solution) ! cell) ++ " is in row " ++ (show $ snd cell) ++ " col " ++ (show $ fst cell)  }}
   | c == 'a' = -- Solve, link to undo/redo to be added
-    state{game = game{board = solution}}
+    state{game = move game (-99,-99) (-99), moves=(movesUpdate moves (((-99),(-99)), (-99)) pointer), gamePointer=pointer+1}
   | c =='s' = --Save
     state{game=saveGame game}
   | c =='r' = --Redo

@@ -39,6 +39,8 @@ library
     , gloss == 1.13.*
     , array
     , random-shuffle
+    , set-cover ==0.0.9
+    , containers
   default-language: Haskell2010
 
 executable JigsawSudokuGameGUI-exe
@@ -54,6 +56,8 @@ executable JigsawSudokuGameGUI-exe
     , gloss == 1.13.*
     , array
     , random-shuffle
+    , set-cover ==0.0.9
+    , containers
   default-language: Haskell2010
 
 test-suite JigsawSudokuGameGUI-test
@@ -70,4 +74,6 @@ test-suite JigsawSudokuGameGUI-test
     , gloss == 1.13.*
     , array
     , random-shuffle
+    , set-cover ==0.0.9
+    , containers
   default-language: Haskell2010
