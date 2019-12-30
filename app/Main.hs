@@ -14,10 +14,9 @@ main :: IO ()
 main = putStrLn "Please enter board file name under board folder of this project(exclude .txt): " >>= \_ ->
         getLine >>= \f ->
             loadGame f >>= \g ->
-                    return GameState{game=g, currentCell=(0,0), solution=undefined, initialBoard=(board g),moves=[], gamePointer=0} >>= \s ->
-                        windowDisplay >>= \w ->
-                            play w white 100 s renderUI inputHandler updateGame >>= \_ ->
-                                putStrLn "Game ends."
+                return GameState{game=g, currentCell=(0,0), solution=undefined, initialBoard=(board g),moves=[], gamePointer=0} >>= \s ->
+                    play FullScreen white 100 s renderUI inputHandler updateGame >>= \_ ->
+                        putStrLn "Game ends."
 
 updateGame :: Float -> GameState -> GameState
 updateGame _ state = state
