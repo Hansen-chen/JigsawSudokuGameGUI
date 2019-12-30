@@ -10,6 +10,7 @@ import System.Directory
 import Graphics.Gloss
 import Graphics.Gloss.Interface.Pure.Game
 
+-- TODO: add valid board check when loading game?
 main :: IO ()
 main = chooseBoard "start" >>= \f ->
                 if (f == "-1") 

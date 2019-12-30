@@ -92,6 +92,7 @@ jigsawSudokuGameReconstruct :: Game -> [((Int,Int), Int)] -> Game
 jigsawSudokuGameReconstruct game [] = game
 jigsawSudokuGameReconstruct game (x:xs) = jigsawSudokuGameReconstruct (move game (fst x) (snd x)) xs
 
+-- TODO: change code variable?
 solveGame :: Game -> (Array (Int, Int) (Int))
 solveGame game =
    let

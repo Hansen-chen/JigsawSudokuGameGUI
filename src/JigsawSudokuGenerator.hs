@@ -15,6 +15,8 @@ import Data.Graph
 import qualified Math.SetCover.Exact as ESC
 import Control.Monad
 
+-- TODO: change code variable?
+
 -- | Sort and group a list based on a function
 groupSortOn :: Ord b => (a -> b) -> [a] -> [[a]]
 groupSortOn f xs = groupBy ((==) `on` f) $ sortOn f xs
