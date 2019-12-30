@@ -10,22 +10,26 @@ import System.Directory
 import Graphics.Gloss
 import Graphics.Gloss.Interface.Pure.Game
 
--- TODO: let player know board name with prefix is board progress, only board name is load original board
 main :: IO ()
 main = chooseBoard "start" >>= \f ->
                 if (f == "-1") 
                 then putStrLn "Bye"
                 else
                   loadGame f >>= \g ->
+                    putStrLn "Please enjoy the game!" >>= \_ ->
                       return GameState{game=g, currentCell=(0,0), solution=(Board (solveGame g) (getBlock $ board g)), initialBoard=(board g),moves=[], gamePointer=0} >>= \s ->
                           play FullScreen white 100 s renderUI inputHandler updateGame
 
+chooseDecoration :: IO ()
+chooseDecoration = putStrLn "******************************************" >>= \_ ->
+                   putStrLn "* Before Entering Jigsaw Sudoku Game GUI *" >>= \_ ->
+                   putStrLn "******************************************"
 
 chooseBoard :: String -> IO String
-chooseBoard state | state == "start" =  putStrLn "\nAvailable Boards:\n" >>= \_ ->
+chooseBoard state | state == "start" =  chooseDecoration >>= \_ ->putStrLn "\nAvailable Boards:\n" >>= \_ ->
                                           showBoards >>= \a ->
                                             mapM putStrLn a >>= \_ ->
-                                              putStrLn "\nPlease enter board number to enter GUI or -1 to quit then press enter" >>= \_ ->
+                                              putStrLn "\nPlease enter board number to enter GUI or -1 to quit, then press enter" >>= \_ ->
                                                 getLine >>= \f ->
                                                   if (isInteger f)
                                                     then
@@ -36,6 +40,7 @@ chooseBoard state | state == "start" =  putStrLn "\nAvailable Boards:\n" >>= \_ 
                                                            then
                                                              putStrLn "Incorrect Input ! Please input number again." >>= \_ -> chooseBoard "start again"
                                                           else
+                                                            -- random board generation
                                                             allBoards >>= \boardModule ->
                                                               allTextsFiles >>= \boardFile ->
                                                                 if(notElem (boardModule !! number ++ "-play") boardFile)
