@@ -41,14 +41,20 @@ chooseBoard state | state == "start" =  chooseDecoration >>= \_ ->putStrLn "\nAv
                                                            then
                                                              putStrLn "Incorrect Input ! Please input number again." >>= \_ -> chooseBoard "start again"
                                                           else
-                                                            -- random board generation
-                                                            allBoards >>= \boardModule ->
-                                                              allTextsFiles >>= \boardFile ->
-                                                                if(notElem (boardModule !! number ++ "-play") boardFile)
-                                                                  then
-                                                                    return (boardModule !! number)
-                                                                else
-                                                                  return (boardModule !! number ++ "-play")
+                                                            if (number == (length a -1))
+                                                              then
+                                                                putStrLn "Please input board name (no more than 10 characters) and press enter" >>= \_ ->
+                                                                  getLine >>= \newF ->
+                                                                    putStrLn "Generating new Jigsaw Sudoku Game board ..." >>= \_ ->
+                                                                      return (take 10 newF)
+                                                            else
+                                                              allBoards >>= \boardModule ->
+                                                                allTextsFiles >>= \boardFile ->
+                                                                  if(notElem (boardModule !! number ++ "-play") boardFile)
+                                                                    then
+                                                                      return (boardModule !! number)
+                                                                  else
+                                                                    return (boardModule !! number ++ "-play")
                                                                 
 
                                                             
@@ -65,9 +71,6 @@ showBoards = getDirectoryContents "board/" >>= \files ->
 
 allBoards :: IO [String]
 allBoards = getDirectoryContents "board/" >>= \files -> return [ take (length x -4) x | x <- files, (length x) > 4 && not ("-play.txt" `isSuffixOf` x) ]
-
-allTextsFiles :: IO [String]
-allTextsFiles = getDirectoryContents "board/" >>= \files -> return [ take (length x -4) x | x <- files, (length x) > 4 ]
 
 isInteger :: String -> Bool
 isInteger s = case reads s :: [(Integer, String)] of

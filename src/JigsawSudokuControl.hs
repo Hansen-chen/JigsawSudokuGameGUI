@@ -8,13 +8,15 @@ import Data.Set (Set)
 import qualified Data.Set as Set
 import System.IO
 import System.IO.Unsafe
+import System.Directory
 import System.Random.Shuffle
 import qualified Math.SetCover.Exact as ESC
 
 
-
+-- add generate board function before readFile(......), writeFile first!!
 loadGame :: String -> IO Game
-loadGame f | "-play" `isSuffixOf` f = readFile ("board/"++f++".txt") >>= \b -> readFile ("board/"++(take ((length f)-5) f)++".txt") >>= \ob -> shuffleM selectedColors >>= \c -> return (Game {board=(loadBoardFormat b), originalBoard=(loadBoardFormat ob), message="Read board "++(take ((length f)-5) f)++" successfully!", filename=(take ((length f)-5) f), blockColors=c }) 
+loadGame f | notElem f (unsafePerformIO $ allTextsFiles) = readFile ("board/"++f++".txt") >>= \b -> shuffleM selectedColors >>= \c -> return (Game {board=(loadBoardFormat b), originalBoard=(loadBoardFormat b), message="Generate board "++f++" successfully!", filename=f, blockColors=c })
+           | "-play" `isSuffixOf` f = readFile ("board/"++f++".txt") >>= \b -> readFile ("board/"++(take ((length f)-5) f)++".txt") >>= \ob -> shuffleM selectedColors >>= \c -> return (Game {board=(loadBoardFormat b), originalBoard=(loadBoardFormat ob), message="Read board "++(take ((length f)-5) f)++" successfully!", filename=(take ((length f)-5) f), blockColors=c }) 
            | otherwise = readFile ("board/"++f++".txt") >>= \b -> shuffleM selectedColors >>= \c -> return (Game {board=(loadBoardFormat b), originalBoard=(loadBoardFormat b), message="Read board "++f++" successfully!", filename=f, blockColors=c })
 
 saveGame :: Game -> Game
@@ -108,3 +110,6 @@ solveGame game =
       solution = head $ ESC.search $ foldl (flip ESC.updateState) (ESC.initState initAssigns) occupiedAssigns
    in
       array ((0, 0), (8, 8)) [((r, c), n) | ((r, c), n) <- solution]
+
+allTextsFiles :: IO [String]
+allTextsFiles = getDirectoryContents "board/" >>= \files -> return [ take (length x -4) x | x <- files, (length x) > 4 ]
