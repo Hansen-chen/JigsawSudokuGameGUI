@@ -1,11 +1,17 @@
 # JigsawSudokuGameGUI
 
-## How to run
+## Run in windows
 
-0. Project root folder
-1. "cabal install ....."
+1. under project root folder, run "cabal install .." necessary packages
 2. "stack ghci"
 3. "main" 
+
+## Run in Mac
+1. under project root folder, run "cabal install .." necessary packages
+2. stack install
+3. stack exec JigsawSudokuGameGUI-exe
+4. full size game screen
+4. shrink size game screen
 
 ## Save and Load board/game progress
 
