@@ -16,9 +16,10 @@ main = chooseBoard "start" >>= \f ->
                 then putStrLn "Bye"
                 else
                   loadGame f >>= \g ->
-                    putStrLn "Please enjoy the game!" >>= \_ ->
-                      return GameState{game=g, currentCell=(0,0), solution=(Board (solveGame g) (getBlock $ board g)), initialBoard=(board g),moves=[], gamePointer=0} >>= \s ->
-                          play FullScreen white 100 s renderUI inputHandler updateGame
+                    putStrLn "Loading Jigsaw Sudoku Game board ..." >>= \_ ->
+                      putStrLn "Entering Jigsaw Sudoku Game GUI..." >>= \_ ->
+                        return GameState{game=g, currentCell=(0,0), solution=(Board (solveGame g) (getBlock $ board g)), initialBoard=(board g),moves=[], gamePointer=0} >>= \s ->
+                            play FullScreen white 100 s renderUI inputHandler updateGame
 
 chooseDecoration :: IO ()
 chooseDecoration = putStrLn "******************************************" >>= \_ ->
@@ -92,8 +93,8 @@ renderDecoration game = pictures
     [
      translate (-globalCellSize*4) (globalCellSize*7) $ color black $ Scale 0.375 0.375 $ (Text $ "Jigsaw Sudoku"),
      translate (-globalCellSize*6.5) (globalCellSize*6) $ color black $ Scale 0.125 0.125 $ (Text $ "arrow(Up/Down/Left/Right): move current cell, 1-9: insert number"),
-     translate (-globalCellSize*6.5) (globalCellSize*5.5) $ color black $ Scale 0.125 0.125 $ (Text $ "backspace/delete: erase number, h: hint, a: solve Sudoku"),
-     translate (-globalCellSize*6.5) (globalCellSize*5) $ color black $ Scale 0.125 0.125 $ (Text $ "u: undo, r: redo, s: save, Esc: quit"),
+     translate (-globalCellSize*6.5) (globalCellSize*5.5) $ color black $ Scale 0.125 0.125 $ (Text $ "backspace/delete: erase number, h: hint, a: solve Sudoku board"),
+     translate (-globalCellSize*6.5) (globalCellSize*5) $ color black $ Scale 0.125 0.125 $ (Text $ "c: clear Sudoku board, u: undo, r: redo, s: save, Esc: quit"),
      translate (-globalCellSize*4) (-globalCellSize*6) $ color black $ Scale 0.125 0.2 $ (Text $ message game),
      color blue $ translate (-globalCellSize*0) (-globalCellSize*6) $ rectangleWire (globalCellSize*9) (globalCellSize*3),
      color blue $ translate (-globalCellSize*0) (-globalCellSize*0) $ rectangleWire (globalCellSize*9) (globalCellSize*9)
@@ -136,6 +137,8 @@ inputHandler (EventKey (Char c) Up _ _) state@(GameState{game=game, currentCell=
     state{game = game{message = "Hint: " ++ (show $ (getNum solution) ! cell) ++ " is in row " ++ (show $ snd cell) ++ " col " ++ (show $ fst cell)  }}
   | c == 'a' = -- Solve
     state{game = move game (-99,-99) (-99), moves=(movesUpdate moves (((-99),(-99)), (-99)) pointer), gamePointer=pointer+1}
+  | c == 'c' = -- Clear board
+    state{game = move game (99,99) (99), moves=(movesUpdate moves (((99),(99)), (99)) pointer), gamePointer=pointer+1}
   | c =='s' = --Save
     state{game=saveGame game}
   | c =='r' = --Redo
