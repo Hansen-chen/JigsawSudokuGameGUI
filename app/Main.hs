@@ -12,20 +12,61 @@ import Graphics.Gloss.Interface.Pure.Game
 
 -- TODO: let player know board name with prefix is board progress, only board name is load original board
 main :: IO ()
-main = putStrLn "Available Boards:\nLoading" >>= \_ ->
-        showBoards >>= \_ ->
-          putStrLn "Please enter board file name shown above(exclude .txt): " >>= \_ ->
-            getLine >>= \f ->
-                loadGame f >>= \g ->
-                    return GameState{game=g, currentCell=(0,0), solution=(Board (solveGame g) (getBlock $ board g)), initialBoard=(board g),moves=[], gamePointer=0} >>= \s ->
-                        play FullScreen white 100 s renderUI inputHandler updateGame >>= \_ ->
-                            putStrLn "Game ends."
+main = chooseBoard "start" >>= \f ->
+                if (f == "-1") 
+                then putStrLn "Bye"
+                else
+                  loadGame f >>= \g ->
+                      return GameState{game=g, currentCell=(0,0), solution=(Board (solveGame g) (getBlock $ board g)), initialBoard=(board g),moves=[], gamePointer=0} >>= \s ->
+                          play FullScreen white 100 s renderUI inputHandler updateGame
+
+
+chooseBoard :: String -> IO String
+chooseBoard state | state == "start" =  putStrLn "\nAvailable Boards:\n" >>= \_ ->
+                                          showBoards >>= \a ->
+                                            mapM putStrLn a >>= \_ ->
+                                              putStrLn "\nPlease enter board number to enter GUI or -1 to quit then press enter" >>= \_ ->
+                                                getLine >>= \f ->
+                                                  if (isInteger f)
+                                                    then
+                                                     if (f == "-1") then return "-1"
+                                                     else
+                                                       return (read f :: Int) >>= \number ->
+                                                         if(number > (length a)-1 || number <0)
+                                                           then
+                                                             putStrLn "Incorrect Input ! Please input number again." >>= \_ -> chooseBoard "start again"
+                                                          else
+                                                            allBoards >>= \boardModule ->
+                                                              allTextsFiles >>= \boardFile ->
+                                                                if(notElem (boardModule !! number ++ "-play") boardFile)
+                                                                  then
+                                                                    return (boardModule !! number)
+                                                                else
+                                                                  return (boardModule !! number ++ "-play")
+                                                                
+
+                                                            
+                                                   else putStrLn "Incorrect Input ! Please input number again." >>= \_ -> chooseBoard "start again"
+                  | otherwise = (chooseBoard "start")
 
 
         
-showBoards :: IO ()
-showBoards = getDirectoryContents "board/" >>= \all -> mapM_ putStrLn all
+showBoards :: IO [String]
+showBoards = getDirectoryContents "board/" >>= \files -> 
+  return [ take (length x -4) x | x <- files, (length x) > 4 && not ("-play.txt" `isSuffixOf` x) ] >>= \boards ->
+    return (zip [0..(length boards -1)] boards) >>= \options ->
+      return ([ (show (fst o)) ++ " => " ++ (snd o)  | o <- options] ++ [(show (length options)) ++ " => Random Board Generation"])
 
+allBoards :: IO [String]
+allBoards = getDirectoryContents "board/" >>= \files -> return [ take (length x -4) x | x <- files, (length x) > 4 && not ("-play.txt" `isSuffixOf` x) ]
+
+allTextsFiles :: IO [String]
+allTextsFiles = getDirectoryContents "board/" >>= \files -> return [ take (length x -4) x | x <- files, (length x) > 4 ]
+
+isInteger :: String -> Bool
+isInteger s = case reads s :: [(Integer, String)] of
+  [(_, "")] -> True
+  _         -> False
 
 updateGame :: Float -> GameState -> GameState
 updateGame _ state = state
