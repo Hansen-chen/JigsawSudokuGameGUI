@@ -27,7 +27,9 @@ source-repository head
 
 library
   exposed-modules:
-      Lib
+      JigsawSudokuConstant
+      JigsawSudokuControl
+      JigsawSudokuType
   other-modules:
       Paths_JigsawSudokuGameGUI
   hs-source-dirs:
