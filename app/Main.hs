@@ -38,7 +38,7 @@ renderDecoration game = pictures
     [
      translate (-globalCellSize*4) (globalCellSize*7) $ color black $ Scale 0.375 0.375 $ (Text $ "Jigsaw Sudoku"),
      translate (-globalCellSize*6.5) (globalCellSize*6) $ color black $ Scale 0.125 0.125 $ (Text $ "arrow(Up/Down/Left/Right): move current cell, 1-9: insert number"),
-     translate (-globalCellSize*6.5) (globalCellSize*5.5) $ color black $ Scale 0.125 0.125 $ (Text $ "backspace: erase number, h: hint, a: solve Sudoku"),
+     translate (-globalCellSize*6.5) (globalCellSize*5.5) $ color black $ Scale 0.125 0.125 $ (Text $ "backspace/delete: erase number, h: hint, a: solve Sudoku"),
      translate (-globalCellSize*6.5) (globalCellSize*5) $ color black $ Scale 0.125 0.125 $ (Text $ "u: undo, r: redo, s: save, Esc: quit"),
      translate (-globalCellSize*4) (-globalCellSize*6) $ color black $ Scale 0.125 0.2 $ (Text $ message game),
      color blue $ translate (-globalCellSize*0) (-globalCellSize*6) $ rectangleWire (globalCellSize*9) (globalCellSize*3),
@@ -70,11 +70,14 @@ inputHandler (EventKey (SpecialKey KeyLeft) Down _ _) state@(GameState{currentCe
 inputHandler (EventKey (SpecialKey KeyRight) Down _ _) state@(GameState{currentCell=cell}) = state{currentCell= moveCurrentCell cell (1) 0}
 inputHandler (EventKey (SpecialKey KeyDown) Down _ _) state@(GameState{currentCell=cell}) = state{currentCell= moveCurrentCell cell 0 (1)}
 inputHandler (EventKey (SpecialKey KeyUp) Down _ _) state@(GameState{currentCell=cell}) = state{currentCell= moveCurrentCell cell 0 (-1) }
+inputHandler (EventKey (SpecialKey KeyDelete) Down _ _) state@(GameState{game=game, currentCell=cell, solution=solution, moves=moves, gamePointer=pointer}) = state{game = move game cell (-1),moves=(movesUpdate moves (cell, (-1)) pointer), gamePointer=pointer+1}
+inputHandler (EventKey (SpecialKey KeyBackspace) Down _ _) state@(GameState{game=game, currentCell=cell, solution=solution, moves=moves, gamePointer=pointer}) = state{game = move game cell (-1),moves=(movesUpdate moves (cell, (-1)) pointer), gamePointer=pointer+1}
+
 inputHandler (EventKey (Char c) Up _ _) state@(GameState{game=game, currentCell=cell, solution=solution, moves=moves, gamePointer=pointer})
   | '1' <= c && c <= '9' = -- Input
     state{game = move game cell (scanChar c),moves=(movesUpdate moves (cell, (scanChar c)) pointer), gamePointer=pointer+1} 
   | c == '\b' = -- Erase
-    state{game = move game cell (-1),moves=(movesUpdate moves (cell, (scanChar c)) pointer), gamePointer=pointer+1}
+    state{game = move game cell (-1),moves=(movesUpdate moves (cell, (-1)) pointer), gamePointer=pointer+1}
   | c == 'h' = -- Hint, link to undo/redo to be added
     state{game = move game cell ((getNum solution) ! cell)}
   | c == 'a' = -- Solve, link to undo/redo to be added
