@@ -44,9 +44,10 @@ chooseBoard state | state == "start" =  chooseDecoration >>= \_ ->putStrLn "\nAv
                                                             if (number == (length a -1))
                                                               then
                                                                 putStrLn "Please input board name (no more than 10 characters) and press enter" >>= \_ ->
-                                                                  getLine >>= \newF ->
-                                                                    putStrLn "Generating new Jigsaw Sudoku Game board ..." >>= \_ ->
-                                                                      return (take 10 newF)
+                                                                  putStrLn "Note: characters in name which is not alphabet or digit will be removed" >>= \_ ->
+                                                                    getLine >>= \newF ->
+                                                                      putStrLn "Generating new Jigsaw Sudoku Game board ..." >>= \_ ->
+                                                                        return (take 10 (validNewBoardName newF))
                                                             else
                                                               allBoards >>= \boardModule ->
                                                                 allTextsFiles >>= \boardFile ->
@@ -161,4 +162,12 @@ movesUpdate oldMoves newMove pointer | (length oldMoves) == 0  = [newMove]
                                      | pointer == (length oldMoves) && (length oldMoves)>0  = oldMoves++[newMove]
                                      | pointer < (length oldMoves) = (take pointer oldMoves)++[newMove]
                                      | otherwise = oldMoves
+
+validNewBoardName :: String -> String
+validNewBoardName n | (filter (\xs -> (xs /=' ') && (isLetterOrDigit xs)) n) == "" = "unname"
+                    | (filter (\xs -> (xs /=' ') && (isLetterOrDigit xs)) n) == n = n
+                    | otherwise = (filter (\xs -> (xs /=' ') && (isLetterOrDigit xs)) n)
+
+isLetterOrDigit :: Char -> Bool
+isLetterOrDigit c = (('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z')|| ('0' <= c && c <= '9'))
 
