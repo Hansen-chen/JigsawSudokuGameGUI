@@ -79,7 +79,7 @@ inputHandler (EventKey (Char c) Up _ _) state@(GameState{game=game, currentCell=
     state{game = move game cell (-1),moves=(movesUpdate moves (cell, (-1)) pointer), gamePointer=pointer+1}
   | c == 'h' = -- Hint
     state{game = game{message = "Hint: " ++ (show $ (getNum solution) ! cell) ++ " is in row " ++ (show $ snd cell) ++ " col " ++ (show $ fst cell)  }}
-  | c == 'a' = -- Solve, link to undo/redo to be added
+  | c == 'a' = -- Solve
     state{game = move game (-99,-99) (-99), moves=(movesUpdate moves (((-99),(-99)), (-99)) pointer), gamePointer=pointer+1}
   | c =='s' = --Save
     state{game=saveGame game}
