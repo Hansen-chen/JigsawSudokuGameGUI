@@ -9,7 +9,7 @@ import System.IO
 import Graphics.Gloss
 import Graphics.Gloss.Interface.Pure.Game
 
-
+-- TODO: let player know board name with prefix is board progress, only board name is load original board
 main :: IO ()
 main = putStrLn "Please enter board file name under board folder of this project(exclude .txt): " >>= \_ ->
         getLine >>= \f ->

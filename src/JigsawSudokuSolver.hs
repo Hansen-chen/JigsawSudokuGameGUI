@@ -1,0 +1,4 @@
+-- TODO:
+-- 1. solver
+-- 2. import in Main.hs
+-- 3. add to cabal file(2 positions to add)
