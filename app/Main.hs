@@ -6,17 +6,26 @@ import JigsawSudokuControl
 import Data.Array
 import Data.List
 import System.IO
+import System.Directory
 import Graphics.Gloss
 import Graphics.Gloss.Interface.Pure.Game
 
 -- TODO: let player know board name with prefix is board progress, only board name is load original board
 main :: IO ()
-main = putStrLn "Please enter board file name under board folder of this project(exclude .txt): " >>= \_ ->
-        getLine >>= \f ->
-            loadGame f >>= \g ->
-                return GameState{game=g, currentCell=(0,0), solution=(Board (solveGame g) (getBlock $ board g)), initialBoard=(board g),moves=[], gamePointer=0} >>= \s ->
-                    play FullScreen white 100 s renderUI inputHandler updateGame >>= \_ ->
-                        putStrLn "Game ends."
+main = putStrLn "Available Boards:\nLoading" >>= \_ ->
+        showBoards >>= \_ ->
+          putStrLn "Please enter board file name shown above(exclude .txt): " >>= \_ ->
+            getLine >>= \f ->
+                loadGame f >>= \g ->
+                    return GameState{game=g, currentCell=(0,0), solution=(Board (solveGame g) (getBlock $ board g)), initialBoard=(board g),moves=[], gamePointer=0} >>= \s ->
+                        play FullScreen white 100 s renderUI inputHandler updateGame >>= \_ ->
+                            putStrLn "Game ends."
+
+
+        
+showBoards :: IO ()
+showBoards = getDirectoryContents "board/" >>= \all -> mapM_ putStrLn all
+
 
 updateGame :: Float -> GameState -> GameState
 updateGame _ state = state

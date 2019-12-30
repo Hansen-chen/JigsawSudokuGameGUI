@@ -41,6 +41,7 @@ library
     , random-shuffle
     , set-cover ==0.0.9
     , containers
+    , directory == 1.3.3.*
   default-language: Haskell2010
 
 executable JigsawSudokuGameGUI-exe
@@ -58,6 +59,7 @@ executable JigsawSudokuGameGUI-exe
     , random-shuffle
     , set-cover ==0.0.9
     , containers
+    , directory == 1.3.3.*
   default-language: Haskell2010
 
 test-suite JigsawSudokuGameGUI-test
@@ -76,4 +78,5 @@ test-suite JigsawSudokuGameGUI-test
     , random-shuffle
     , set-cover ==0.0.9
     , containers
+    , directory == 1.3.3.*
   default-language: Haskell2010
