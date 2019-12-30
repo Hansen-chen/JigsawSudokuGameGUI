@@ -2,10 +2,10 @@ module JigsawSudokuControl where
 
 import JigsawSudokuType
 import JigsawSudokuConstant
+import JigsawSudokuGenerator
 import Data.List
 import Data.Array
 import Data.Set (Set)
-import qualified Data.Set as Set
 import System.IO
 import System.IO.Unsafe
 import System.Directory
@@ -13,9 +13,8 @@ import System.Random.Shuffle
 import qualified Math.SetCover.Exact as ESC
 
 
--- add generate board function before readFile(......), writeFile first!!
 loadGame :: String -> IO Game
-loadGame f | notElem f (unsafePerformIO $ allTextsFiles) = readFile ("board/"++f++".txt") >>= \b -> shuffleM selectedColors >>= \c -> return (Game {board=(loadBoardFormat b), originalBoard=(loadBoardFormat b), message="Generate board "++f++" successfully!", filename=f, blockColors=c })
+loadGame f | notElem f (unsafePerformIO $ allTextsFiles) = generateBoard >>= \b -> writeFile ("board/"++f++".txt") (saveBoardFormat $ b) >>= \_ -> readFile ("board/"++f++".txt") >>= \gb -> shuffleM selectedColors >>= \c -> return (Game {board=(loadBoardFormat gb), originalBoard=(loadBoardFormat gb), message="Generate board "++f++" successfully!", filename=f, blockColors=c })
            | "-play" `isSuffixOf` f = readFile ("board/"++f++".txt") >>= \b -> readFile ("board/"++(take ((length f)-5) f)++".txt") >>= \ob -> shuffleM selectedColors >>= \c -> return (Game {board=(loadBoardFormat b), originalBoard=(loadBoardFormat ob), message="Read board "++(take ((length f)-5) f)++" successfully!", filename=(take ((length f)-5) f), blockColors=c }) 
            | otherwise = readFile ("board/"++f++".txt") >>= \b -> shuffleM selectedColors >>= \c -> return (Game {board=(loadBoardFormat b), originalBoard=(loadBoardFormat b), message="Read board "++f++" successfully!", filename=f, blockColors=c })
 
@@ -92,14 +91,6 @@ jigsawSudokuGameRedo state | (gamePointer state) == length (moves state) = state
 jigsawSudokuGameReconstruct :: Game -> [((Int,Int), Int)] -> Game
 jigsawSudokuGameReconstruct game [] = game
 jigsawSudokuGameReconstruct game (x:xs) = jigsawSudokuGameReconstruct (move game (fst x) (snd x)) xs
-
-assign :: Int -> Int -> Int -> Int -> Assign (Set X)
-assign n r c b =
-   ESC.assign ((r, c), n) $
-   Set.fromList [Pos r c, Row n r, Column n c, Block n b]
-
-assigns :: (Array (Int, Int) Int) -> [Assign (Set X)]
-assigns blocks = [assign n r c b | n <- [1..9], r <- [0..8], c <- [0..8], let b = blocks ! (r, c)]
 
 solveGame :: Game -> (Array (Int, Int) (Int))
 solveGame game =
