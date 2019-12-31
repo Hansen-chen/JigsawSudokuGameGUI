@@ -53,8 +53,8 @@ move game (x,y) n | x==(-99) && y==(-99) && n==(-99) && ((solveGame game) ! (0,0
                 | x==(-99) && y==(-99) && n==(-99) && ((solveGame game) ! (0,0) /= -1) = game{board = (Board (solveGame game) (getBlock (board game))), message ="Solved the board! Press u to undo"}
                 | x==(99) && y==(99) && n==(99) = game{board = (Board (getNum (originalBoard game)) (getBlock (board game))), message ="Cleared the board! Press u to undo"}
                 | n == (-1) && ( getNum (originalBoard game) ! (x,y) <0) = game{board = (Board ((getNum (board game)) // [((x,y), n)]) (getBlock (board game))), message="Erased "++ (show ((getNum (board game)) ! (x,y))) ++ " in row " ++ (show y) ++ ", col " ++ (show x) }
-                | (check (board game) x y n) && (getNum (originalBoard game) ! (x,y)<0) && (not $ jigsawSudokuCheck (Board ((getNum (board game)) // [((x,y), n)]) (getBlock (board game)))) = game{board = (Board ((getNum (board game)) // [((x,y), n)]) (getBlock (board game))), message="Inserted "++ (show n) ++ " in row " ++ (show y) ++ ", col " ++ (show x) }
-                | (check (board game) x y n) && (getNum (originalBoard game) ! (x,y)<0) && (jigsawSudokuCheck (Board ((getNum (board game)) // [((x,y), n)]) (getBlock (board game)))) = game{board = (Board ((getNum (board game)) // [((x,y), n)]) (getBlock (board game))), message="Congratulations! You win the game!" }
+                | (check (board game) x y n) && (getNum (originalBoard game) ! (x,y)<0) && (not $ jigsawSudokuCheck game (Board ((getNum (board game)) // [((x,y), n)]) (getBlock (board game)))) = game{board = (Board ((getNum (board game)) // [((x,y), n)]) (getBlock (board game))), message="Inserted "++ (show n) ++ " in row " ++ (show y) ++ ", col " ++ (show x) }
+                | (check (board game) x y n) && (getNum (originalBoard game) ! (x,y)<0) && (jigsawSudokuCheck game (Board ((getNum (board game)) // [((x,y), n)]) (getBlock (board game)))) = game{board = (Board ((getNum (board game)) // [((x,y), n)]) (getBlock (board game))), message="Congratulations! You win the game!" }
                 | n == (-1) && ( getNum (originalBoard game) ! (x,y) >0) = game{message="Cannot erase "++ (show ((getNum (board game)) ! (x,y))) ++ " in row " ++ (show y) ++ ", col " ++ (show x) }
                 | otherwise = game{message="Cannot insert "++ (show n) ++ " in row " ++ (show y) ++ ", col " ++ (show x)}
 
@@ -71,9 +71,8 @@ jigsawBlockCheck :: Board -> Int -> Int -> Int -> Bool
 jigsawBlockCheck (Board num loc) x y n = not (elem n (map ((!) num) (map (\((a,b),_) -> (a,b)) (filter (\((_,_),c) -> c == loc ! (x,y)) (assocs loc)))))
 
 -- Decide whether the player win or not
--- TODO: win check includes Jigsaw Sudoku Game rules check
-jigsawSudokuCheck :: Board -> Bool
-jigsawSudokuCheck (Board num loc) = not (elem (-1) (elems num))
+jigsawSudokuCheck :: Game -> Board -> Bool
+jigsawSudokuCheck game (Board num loc) = num == (solveGame game)
 
 getNum :: Board -> (Array (Int, Int) Int)
 getNum (Board num _) = num
