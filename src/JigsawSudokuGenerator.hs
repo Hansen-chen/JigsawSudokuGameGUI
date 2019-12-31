@@ -29,7 +29,7 @@ generateBoard = do
     generate = generateBlocks >>= \block -> generateNum block >>= \number -> return (Board number block) 
       
 
--- generate blocks
+-- Generate blocks
 
 generateBlocks :: IO (Array (Int, Int) Int)
 generateBlocks = do
@@ -55,7 +55,7 @@ generateBlocks = do
           then transformBlocks blocks'
           else transformBlocks blocks
 
--- generate number in board
+-- Generate numbers in board
 
 generateNum :: (Array (Int, Int) Int) -> IO (Array (Int, Int) Int)
 generateNum blocks = do
@@ -115,7 +115,7 @@ groupSortOn f xs = groupBy ((==) `on` f) $ sortOn f xs
 pick :: [b] -> IO b
 pick x = fmap (x !!) $ randomRIO (0, length x - 1)
 
--- make only a single solution
+-- Make only a single solution
 
 oneSol :: (Array (Int, Int) Int) -> [Association] -> [Association]
 oneSol blocks solution = 
