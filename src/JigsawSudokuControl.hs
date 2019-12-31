@@ -49,7 +49,7 @@ printArraySave arr = unlines [unwords [if (arr ! (x, y)) >= 0 then show (arr ! (
 
 -- Make Move with Jigsaw Sudoku game rules checking, insert move into array
 move :: Game -> (Int, Int) -> Int -> Game
-move game (x,y) n | x==(-99) && y==(-99) && n==(-99) && ((solveGame game) ! (0,0) == -1) = game{message ="This board has no solution! Press u to undo"}
+move game (x,y) n | x==(-99) && y==(-99) && n==(-99) && ((solveGame game) ! (0,0) == -1) = game{message ="This board has no solution!"}
                 | x==(-99) && y==(-99) && n==(-99) && ((solveGame game) ! (0,0) /= -1) = game{board = (Board (solveGame game) (getBlock (board game))), message ="Solved the board! Press u to undo"}
                 | x==(99) && y==(99) && n==(99) = game{board = (Board (getNum (originalBoard game)) (getBlock (board game))), message ="Cleared the board! Press u to undo"}
                 | n == (-1) && ( getNum (originalBoard game) ! (x,y) <0) = game{board = (Board ((getNum (board game)) // [((x,y), n)]) (getBlock (board game))), message="Erased "++ (show ((getNum (board game)) ! (x,y))) ++ " in row " ++ (show y) ++ ", col " ++ (show x) }
