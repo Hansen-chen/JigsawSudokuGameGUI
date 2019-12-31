@@ -10,7 +10,6 @@ import System.Directory
 import Graphics.Gloss
 import Graphics.Gloss.Interface.Pure.Game
 
--- TODO: add valid board check when loading game?
 main :: IO ()
 main = chooseBoard "start" >>= \f ->
                 if (f == "-1") 
@@ -139,7 +138,7 @@ inputHandler (EventKey (Char c) Up _ _) state@(GameState{game=game, currentCell=
   | c == '\b' = -- Erase
     state{game = move game cell (-1),moves=(movesUpdate moves (cell, (-1)) pointer), gamePointer=pointer+1}
   | c == 'h' = -- Hint
-    state{game = game{message = "Hint: " ++ (show $ (getNum solution) ! cell) ++ " is in row " ++ (show $ snd cell) ++ " col " ++ (show $ fst cell)  }}
+    state{game = game{message = (generateHint solution cell)}}
   | c == 'a' = -- Solve
     state{game = move game (-99,-99) (-99), moves=(movesUpdate moves (((-99),(-99)), (-99)) pointer), gamePointer=pointer+1}
   | c == 'c' = -- Clear board
@@ -172,3 +171,6 @@ validNewBoardName n | (filter (\xs -> (xs /=' ') && (isLetterOrDigit xs)) n) == 
 isLetterOrDigit :: Char -> Bool
 isLetterOrDigit c = (('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z')|| ('0' <= c && c <= '9'))
 
+generateHint :: Board -> (Int, Int) ->String
+generateHint solution cell | ((getNum solution) ! cell) == -1 = "Hint: This board has no solution"
+                           | otherwise = "Hint: " ++ (show $ (getNum solution) ! cell) ++ " is in row " ++ (show $ snd cell) ++ " col " ++ (show $ fst cell)  

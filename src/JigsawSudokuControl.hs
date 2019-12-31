@@ -49,7 +49,8 @@ printArraySave arr = unlines [unwords [if (arr ! (x, y)) >= 0 then show (arr ! (
 
 -- Make Move with Jigsaw Sudoku game rules checking, insert move into array
 move :: Game -> (Int, Int) -> Int -> Game
-move game (x,y) n | x==(-99) && y==(-99) && n==(-99) = game{board = (Board (solveGame game) (getBlock (board game))), message ="Solved the board! Press u to undo"}
+move game (x,y) n | x==(-99) && y==(-99) && n==(-99) && ((solveGame game) ! (0,0) == -1) = game{message ="This board has no solution! Press u to undo"}
+                | x==(-99) && y==(-99) && n==(-99) && ((solveGame game) ! (0,0) /= -1) = game{board = (Board (solveGame game) (getBlock (board game))), message ="Solved the board! Press u to undo"}
                 | x==(99) && y==(99) && n==(99) = game{board = (Board (getNum (originalBoard game)) (getBlock (board game))), message ="Cleared the board! Press u to undo"}
                 | n == (-1) && ( getNum (originalBoard game) ! (x,y) <0) = game{board = (Board ((getNum (board game)) // [((x,y), n)]) (getBlock (board game))), message="Erased "++ (show ((getNum (board game)) ! (x,y))) ++ " in row " ++ (show y) ++ ", col " ++ (show x) }
                 | (check (board game) x y n) && (getNum (originalBoard game) ! (x,y)<0) && (not $ jigsawSudokuCheck (Board ((getNum (board game)) // [((x,y), n)]) (getBlock (board game)))) = game{board = (Board ((getNum (board game)) // [((x,y), n)]) (getBlock (board game))), message="Inserted "++ (show n) ++ " in row " ++ (show y) ++ ", col " ++ (show x) }
@@ -92,16 +93,21 @@ jigsawSudokuGameReconstruct :: Game -> [((Int,Int), Int)] -> Game
 jigsawSudokuGameReconstruct game [] = game
 jigsawSudokuGameReconstruct game (x:xs) = jigsawSudokuGameReconstruct (move game (fst x) (snd x)) xs
 
--- TODO: change code variable?
 solveGame :: Game -> (Array (Int, Int) (Int))
 solveGame game =
    let
       initAssigns =  assigns $ getBlock (originalBoard game)
       occupied = filter (\((_,_),i) -> i /= (-1)) $ assocs $ getNum (originalBoard game)
       occupiedAssigns = [assign n r c b | ((r, c), n) <- occupied, let b = (getBlock (originalBoard game)) ! (r, c)]
-      solution = head $ ESC.search $ foldl (flip ESC.updateState) (ESC.initState initAssigns) occupiedAssigns
+      solution = getSol initAssigns occupiedAssigns
    in
       array ((0, 0), (8, 8)) [((r, c), n) | ((r, c), n) <- solution]
-
+ 
 allTextsFiles :: IO [String]
 allTextsFiles = getDirectoryContents "board/" >>= \files -> return [ take (length x -4) x | x <- files, (length x) > 4 ]
+ 
+getSol :: [Assign (Set X)] -> [Assign (Set X)] -> [((Int, Int), (Int))]
+getSol initAssigns occupiedAssigns | (length (ESC.search $ foldl (flip ESC.updateState) (ESC.initState initAssigns) occupiedAssigns)) == 0 =[ ((x,y), -1) | x <- [0..8], y <- [0..8]]
+                                   | otherwise = (head $ ESC.search $ foldl (flip ESC.updateState) (ESC.initState initAssigns) occupiedAssigns)
+
+
