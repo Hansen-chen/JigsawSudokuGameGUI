@@ -2,7 +2,7 @@
 
 ## Important Note
 
-0. Please run stack upgrade before building the project
+0. Please run "stack upgrade" before building the project
 
 ## Run in Mac/windows
 
