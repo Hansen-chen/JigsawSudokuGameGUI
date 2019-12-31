@@ -1,8 +1,8 @@
 # JigsawSudokuGameGUI
 
-## Note
+## Important Note
 
-0. Do not put invalid board txt file in board folder of this project
+0. Please run stack upgrade before building the project
 
 ## Run in Mac/windows
 
