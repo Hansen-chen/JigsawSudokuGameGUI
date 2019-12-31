@@ -92,15 +92,17 @@ jigsawSudokuGameReconstruct :: Game -> [((Int,Int), Int)] -> Game
 jigsawSudokuGameReconstruct game [] = game
 jigsawSudokuGameReconstruct game (x:xs) = jigsawSudokuGameReconstruct (move game (fst x) (snd x)) xs
 
+-- Modified from https://hub.darcs.net/thielema/set-cover/browse/example/Sudoku.hs
+
 solveGame :: Game -> (Array (Int, Int) (Int))
 solveGame game =
    let
       initAssigns =  assigns $ getBlock (originalBoard game)
       occupied = filter (\((_,_),i) -> i /= (-1)) $ assocs $ getNum (originalBoard game)
-      occupiedAssigns = [assign n r c b | ((r, c), n) <- occupied, let b = (getBlock (originalBoard game)) ! (r, c)]
+      occupiedAssigns = [assign n x y b | ((x, y), n) <- occupied, let b = (getBlock (originalBoard game)) ! (x, y)]
       solution = getSol initAssigns occupiedAssigns
    in
-      array ((0, 0), (8, 8)) [((r, c), n) | ((r, c), n) <- solution]
+      array ((0, 0), (8, 8)) [((x, y), n) | ((x, y), n) <- solution]
  
 allTextsFiles :: IO [String]
 allTextsFiles = getDirectoryContents "board/" >>= \files -> return [ take (length x -4) x | x <- files, (length x) > 4 ]
