@@ -2,7 +2,7 @@
 
 ## Project Report
 
-This is a Jigsaw Sudoku Game with GUI, random map generator, solver and game saver. Please find project report for your reference [link to project report!](https://github.com/Hansen-chen/JigsawSudokuGameGUI/blob/master/COMP3258%20Final%20Project%20Report.pdf)
+This is a Jigsaw Sudoku Game with GUI, random map generator, solver and game saver. Please find project report for your reference. [project report](https://github.com/Hansen-chen/JigsawSudokuGameGUI/blob/master/COMP3258%20Final%20Project%20Report.pdf)
 
 ## Important Note
 
